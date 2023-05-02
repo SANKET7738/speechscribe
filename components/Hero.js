@@ -1,13 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomButton from './CustomButton';
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/actions';
+
+WebBrowser.maybeCompleteAuthSession();
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 const isMobile = screenWidth <= 768; // Change the threshold value as needed
 
 function Hero() {
+    const dispatch = useDispatch()
+    const [token, setToken] = useState("");
+    const [userInfo, setUserInfo] = useState(null);
+
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        webClientId: "",
+        expoClientId: ""
+    })
+
+    useEffect(() => {
+        if (response?.type === "success") {
+            setToken(response.authentication.accessToken);
+            getUserInfo();
+        }
+    }, [response, token]);
+
+    const getUserInfo = async () => {
+        try {
+          const response = await fetch(
+            "https://www.googleapis.com/userinfo/v2/me",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+    
+          const user = await response.json();
+          console.log(user);
+          dispatch(setUser(user));
+          setUserInfo(user);
+        } catch (error) {
+          // Add your own error handler here
+        }
+      };
+    
+
   return (
     <LinearGradient
       colors={['black', '#A03333', '#23135A']}
@@ -36,6 +77,9 @@ function Hero() {
                 textColor = "white"
                 style = {{
                     marginLeft: 10,
+                }}
+                onPress={() => {
+                    promptAsync();
                 }}
             />
         </View>
