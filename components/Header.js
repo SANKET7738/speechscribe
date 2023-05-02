@@ -20,7 +20,7 @@ function Header() {
     const [request, response, promptAsync] = Google.useAuthRequest({
         // TODO: read from .env files
         webClientId: "",
-        expoClientId: ""
+        expoClientId: "",
     })
 
     useEffect(() => {

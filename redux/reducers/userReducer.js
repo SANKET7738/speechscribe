@@ -1,7 +1,7 @@
 import { USER_STATE_CHANGE } from "../constants";
 
 const initialState = {
-    currentUser: null,
+    currentUser: 'sanket',
 }
 
 export const user = (state = initialState, action) => {
